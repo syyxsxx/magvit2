@@ -19,8 +19,8 @@ r"""Configs for the VQGAN-2D on the UCF101.
 
 import ml_collections
 
-CUSTOM_DATASET_TRAIN_SIZE = 399998
-CUSTOM_DATASET_TEST_SIZE = 99999
+CUSTOM_DATASET_TRAIN_SIZE = 13600000
+CUSTOM_DATASET_TEST_SIZE = 380000
 NUM_CLASSES = 2
 VARIANT = 'VQGAN/2D'
 
@@ -35,9 +35,9 @@ def get_config(config_str='H'):
   # Overall
   config.rng_seed = 0
   config.image_size = 128
-  config.batch_size = 18
+  config.batch_size = 256
   config.eval_batch_size = config.get_ref('batch_size') // 4
-  config.num_training_epochs = 300
+  config.num_training_epochs = 10
   config.lax_precision = 'default'
 
   # Dataset.
@@ -67,6 +67,7 @@ def get_config(config_str='H'):
   config.perceptual_loss_weight = 0.1
   config.perceptual_loss_on_logit = True
   config.polyak_decay = 0.999  # ema decay factor for generator
+  config.reconstruction_loss_weight = 5.0
 
   config.vqgan = ml_collections.ConfigDict()
   config.vqgan.model_type = model_type
@@ -118,6 +119,8 @@ def get_config(config_str='H'):
 
   steps_per_epoch = CUSTOM_DATASET_TRAIN_SIZE // config.get_ref('batch_size')
   total_steps = config.get_ref('num_training_epochs') * steps_per_epoch
+  config.steps_per_epoch = steps_per_epoch
+  config.total_steps = total_steps
   config.lr_configs = ml_collections.ConfigDict()
   config.lr_configs.learning_rate_schedule = 'compound'
   config.lr_configs.factors = 'constant * cosine_decay * linear_warmup'
@@ -147,8 +150,8 @@ def get_config(config_str='H'):
   # Logging.
   config.logging = ml_collections.ConfigDict()
   config.logging.enable_checkpoint = True
-  config.logging.checkpoint_steps = 20000
-  config.logging.checkpoint_kept = 50
+  config.logging.checkpoint_steps = 10000
+  config.logging.checkpoint_kept = 100
   config.logging.log_metric_steps = 100
   config.logging.log_sample_size = 2
 

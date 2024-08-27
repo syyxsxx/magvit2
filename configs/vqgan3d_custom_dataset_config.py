@@ -33,9 +33,9 @@ def get_config(config_str='H'):
     model_class, model_type = VARIANT.split('/')
 
     # Overall
-    config.batch_size = {'B': 2, 'L': 4, 'H': 18}[version]
+    config.batch_size = {'B': 2, 'L': 4, 'H': 256}[version]
     config.eval_batch_size = config.get_ref('batch_size') // 4
-    config.num_training_epochs = {'B': 500, 'L': 2000, 'H': 300}[version]
+    config.num_training_epochs = {'B': 500, 'L': 2000, 'H': 10}[version]
 
     # Dataset.
     del config.num_train_sampled_frames

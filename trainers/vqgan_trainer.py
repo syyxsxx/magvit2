@@ -292,7 +292,8 @@ def train_g_d(
     g_adversarial_loss = losses.generator_loss(
         fake_logit=fake_logit, loss_type=config.vqgan.loss_type
     ) * config.vqgan.g_adversarial_loss_weight
-    reconstruction_loss = losses.l2_loss(real_video, generated_video)
+    reconstruction_loss_weight = config.get('reconstruction_loss_weight', 1.0)
+    reconstruction_loss = losses.l2_loss(real_video, generated_video) * reconstruction_loss_weight
     perceptual_loss = 0.0
 
     if config.perceptual_loss_weight != 0:
@@ -622,9 +623,11 @@ def train(*, rng: jnp.ndarray, config: ml_collections.ConfigDict,
         init_checkpoint_path, train_state, config)
 
   # Get learning rate scheduler.
-  total_steps, steps_per_epoch = scenic_train_utils.get_num_training_steps(
-      config, dataset.meta_data)
+  #total_steps, steps_per_epoch = scenic_train_utils.get_num_training_steps(
+  #    config, dataset.meta_data)
 
+  steps_per_epoch = config.('steps_per_epoch')
+  total_steps = config.('total_steps')
   train_utils.check_training_step(steps_per_epoch, config)
 
   # Training step pmap.
